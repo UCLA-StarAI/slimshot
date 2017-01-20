@@ -66,6 +66,7 @@ class IndependentProject(object):
             self.child = None
 
     def generateSQL_DNF(self, separatorSubs=None):
+        print "Generating sql for universal quantifier"
         if separatorSubs is None:
             separatorSubs = []
         replacementVal = algorithm.attCounter()
@@ -92,7 +93,7 @@ class IndependentProject(object):
         else:
             sql = "\n -- independent project \n select %s as pUse from (%s) as q%d %s " % (
                 selectString, childSQL, algorithm.counter(), groupByString)
-
+        print sql
         return sql
 
     def isInequalityVar(self, separatorVar):

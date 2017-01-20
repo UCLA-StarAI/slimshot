@@ -30,6 +30,10 @@ def getPlan(queryDNF):
     return algorithm.getSafeQueryPlan(queryDNF)
 
 
+def getOpenPlan(queryDNF):
+    return algorithm.getSafeOpenQueryPlan(queryDNF)
+
+
 def executeSQL(sql):
     prob = None
     cur = conn.cursor()
@@ -172,6 +176,7 @@ class CommandLineParser(cmd.Cmd):
     sample = True
     karpluby = False
     naive = False
+    openworld = False
     numSamples = 1000
     graphQueryPlanFile = "/tmp/query.png"
     showGraph = False
@@ -358,6 +363,13 @@ class CommandLineParser(cmd.Cmd):
             print "Execute SQL on"
         else:
             print "Execute SQL off"
+
+    def do_openworld(self, line):
+        self.openworld = not self.openworld
+        if self.openworld:
+            print "Open-World on"
+        else:
+            print "Open-World off"
 
     def do_karpluby(self, line):
         self.karpluby = not self.karpluby
