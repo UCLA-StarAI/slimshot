@@ -24,7 +24,8 @@ p   double precision
 
 INSERT INTO RT (v0, p) VALUES
 (1, 0.4),
-(2, 0.6)
+(2, 0.6),
+(3, 0.5)
 ;
 INSERT INTO ST (v0, v1, p) VALUES
 (1, 1, 0.5),
