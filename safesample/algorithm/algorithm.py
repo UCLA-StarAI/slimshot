@@ -6,8 +6,11 @@ import pprint
 
 import ground_tup
 import incl_excl
+import incl_excl_open
 import ind_join
+import ind_join_open
 import ind_proj
+import ind_proj_open
 import ind_union
 import query_exp
 import query_sym
@@ -20,9 +23,6 @@ def getSafeOpenQueryPlanNaive(dnf):
         cnf = dnf.minimize()
 
     symbolComponentsDNF = query_exp.computeSymbolComponentsDNF(dnf)
-    print "New iteration"
-    print dnf
-    print symbolComponentsDNF
     if len(symbolComponentsDNF) > 1:
         termList = [query_exp.DNF((list(s))) for s in symbolComponentsDNF]
         return ind_union.IndependentUnion(cnf, termList)
@@ -32,7 +32,7 @@ def getSafeOpenQueryPlanNaive(dnf):
     # independent join
     if len(symbolComponents) > 1:
         termList = [query_exp.CNF(list(s)) for s in symbolComponents]
-        return ind_join.IndependentJoin(cnf, termList)
+        return ind_join_open.IndependentJoin(cnf, termList)
 
     # inclusion/exclusion
     if len(cnf.getDisjuncts()) > 1:
@@ -99,7 +99,7 @@ def getSafeOpenQueryPlanNaive(dnf):
     # separator variable
     separator = d.getSeparator()
     if separator:
-        return ind_proj.IndependentProject(cnf, d, separator)
+        return ind_proj_open.IndependentProject(cnf, d, separator)
 
     lexpr = nltk.Expression.fromstring
     p9d = lexpr(d.toProver9())
@@ -141,9 +141,6 @@ def getSafeQueryPlan(dnf):
         cnf = dnf.minimize()
 
     symbolComponentsDNF = query_exp.computeSymbolComponentsDNF(dnf)
-    print "New iteration"
-    print dnf
-    print symbolComponentsDNF
     if len(symbolComponentsDNF) > 1:
         termList = [query_exp.DNF((list(s))) for s in symbolComponentsDNF]
         return ind_union.IndependentUnion(cnf, termList)

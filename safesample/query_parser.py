@@ -31,7 +31,7 @@ def getPlan(queryDNF):
 
 
 def getOpenPlan(queryDNF):
-    return algorithm.getSafeOpenQueryPlan(queryDNF)
+    return algorithm.getSafeOpenQueryPlanNaive(queryDNF)
 
 
 def executeSQL(sql):
@@ -197,7 +197,11 @@ class CommandLineParser(cmd.Cmd):
             queryDNF = parse(queryStr)
             print "Query: ", queryDNF
             try:
-                plan = getPlan(queryDNF)
+                if(self.openworld):
+                    plan = getOpenPlan(queryDNF)
+                else:
+                    plan = getPlan(queryDNF)
+
                 querySQL = plan.generateSQL_DNF()
                 print algorithm.getPrettySQL(querySQL), "\n"
                 if self.graphQueryPlan:
@@ -417,5 +421,22 @@ if __name__ == '__main__':
 
     conn = psycopg2.connect(dbname=database)
     conn.autocommit = True
-    
+ #    sql = """SELECT c7,
+ #        ior(COALESCE(pUse,0)) AS pUse
+ #   FROM
+ #     ( -- ground tuple
+ # SELECT st.v0 AS c8,
+ #        st.v1 AS c7,
+ #        p AS pUse
+ #      FROM st) AS q13
+ #   GROUP BY c7"""
+ #    cur = conn.cursor()
+ #    try:
+ #        cur.execute(sql)
+ #        print(cur.fetchall())
+ #        cur.close()
+ #    except psycopg2.Error as e:
+ #        print "SQL error: %s" % e.pgerror
+ #        cur.close()
+
     CommandLineParser().cmdloop()
