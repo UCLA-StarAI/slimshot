@@ -5,6 +5,7 @@ import sqlparse
 import pprint
 
 import ground_tup
+import ground_tup_open
 import incl_excl
 import incl_excl_open
 import ind_join
@@ -12,9 +13,12 @@ import ind_join_open
 import ind_proj
 import ind_proj_open
 import ind_union
+import ind_union_open
 import query_exp
 import query_sym
 
+lam=0.7
+dom=5
 
 def getSafeOpenQueryPlanNaive(dnf):
     if isinstance(dnf, query_exp.DNF):
@@ -25,7 +29,7 @@ def getSafeOpenQueryPlanNaive(dnf):
     symbolComponentsDNF = query_exp.computeSymbolComponentsDNF(dnf)
     if len(symbolComponentsDNF) > 1:
         termList = [query_exp.DNF((list(s))) for s in symbolComponentsDNF]
-        return ind_union.IndependentUnion(cnf, termList)
+        return ind_union_open.IndependentUnion(cnf, termList)
 
     symbolComponents = query_exp.computeSymbolComponentsCNF(cnf)
 
@@ -76,7 +80,7 @@ def getSafeOpenQueryPlanNaive(dnf):
             subplans.append(term)
             finalCoeffList.append(coeffList[ind])
 
-        return incl_excl.InclusionExclusion(cnf, subplans, finalCoeffList)
+        return incl_excl_open.InclusionExclusion(cnf, subplans, finalCoeffList)
 
     d = cnf.getDisjuncts()[0]
     symbolComponents = query_exp.computeSymbolComponentsDisjunct(d)
@@ -88,13 +92,13 @@ def getSafeOpenQueryPlanNaive(dnf):
                 [query_exp.DisjunctiveQuery(list(s))]
             ) for s in symbolComponents]
 
-        return ind_union.IndependentUnion(cnf, termList)
+        return ind_union_open.IndependentUnion(cnf, termList)
 
     # ground tuple
     if not d.hasVariables():
         comInd = 0  # only one component in a ground tuple
         rel = d.getComponents()[comInd].getRelations()[comInd]
-        return ground_tup.GroundTuple(cnf, d, rel)
+        return ground_tup_open.GroundTuple(cnf, d, rel)
 
     # separator variable
     separator = d.getSeparator()

@@ -62,6 +62,7 @@ class IndependentProject(object):
 
         if init:
             self.child = algorithm.getSafeOpenQueryPlanNaive(self.childDNF)
+            self.lam = 1 - (1 - self.child.lam) ** algorithm.dom
         else:
             self.child = None
 

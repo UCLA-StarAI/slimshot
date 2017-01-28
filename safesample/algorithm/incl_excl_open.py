@@ -36,7 +36,7 @@ class InclusionExclusion(object):
         self.children = []
         if init:
             for ind, term in enumerate(self.subqueries):
-                plan = algorithm.getSafeQueryPlan(term)
+                plan = algorithm.getSafeOpenQueryPlanNaive(term)
                 self.children.append(plan)
 
     def generateSQL_DNF(self, separatorSubs=None):

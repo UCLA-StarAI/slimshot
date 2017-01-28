@@ -1,4 +1,5 @@
 import algorithm
+import operator
 
 lam = 0.3
 
@@ -32,6 +33,7 @@ class IndependentJoin(object):
 
         if init:
             self.children = map(algorithm.getSafeOpenQueryPlanNaive, self.subqueries)
+            self.lam = reduce(operator.mul, [x.lam for x in self.children], 1)
         else:
             self.children = []
 
@@ -153,7 +155,8 @@ class IndependentJoin(object):
                 "q%d.c%d" %
                 (termIdentWithThisSubstitution, separatorReplacement))
 
-        pString = '*'.join(["COALESCE(q%d.pUse,%f)" % (i, lam) for i in counters])
+        # pString = '*'.join(["COALESCE(q%d.pUse,q%d.lam)" % (i, i) for i in counters])
+        pString = '*'.join(["COALESCE(q%d.pUse,%f)" % (i, l) for i, l in zip(counters, [c.lam for c in self.children])])
         #pString = '*'.join(["q%d.pUse" % i for i in counters])
         attString = ', '.join(selectAttributes)
         if attString:
