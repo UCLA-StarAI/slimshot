@@ -92,8 +92,10 @@ class IndependentProject(object):
             sql = "\n -- independent project \n select %s, %s as pUse from (%s) as q%d %s " % (
                 genericConstantStr, selectString, childSQL, algorithm.counter(), groupByString)
         else:
-            sql = "\n -- independent project \n select %s as pUse from (%s) as q%d %s " % (
-                selectString, childSQL, algorithm.counter(), groupByString)
+            add_line = ','.join(groupBy + ["(1.0 - (1.0 - pUse) * power(1.0 - %.10f, (%d - ct))) as pUse" % (self.child.lam, algorithm.dom)])
+            sql = "\n -- independent project \n select %s from (select %s as pUse, count(*) as ct from (%s) as q%d %s) as q%d" % (
+                           add_line, selectString, childSQL, algorithm.counter(), groupByString, algorithm.counter())
+
 
         return sql
 

@@ -17,8 +17,8 @@ import ind_union_open
 import query_exp
 import query_sym
 
-lam=0.7
-dom=5
+lam=0.01
+dom=4
 
 def getSafeOpenQueryPlanNaive(dnf):
     if isinstance(dnf, query_exp.DNF):

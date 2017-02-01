@@ -83,8 +83,8 @@ class GroundTuple(object):
                     raise Exception("A ground tuple can't have constants!")
                 else:
                     selectAttributes.append(
-                        "%s.v%d as c%d, %f as lam" %
-                        (relSym, i, relArgs[i].getReplacement(), algorithm.lam))
+                        "%s.v%d as c%d" %
+                        (relSym, i, relArgs[i].getReplacement()))
 
         whereConditions = []
         extraSelectAttribute = ""

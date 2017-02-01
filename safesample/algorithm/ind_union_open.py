@@ -31,7 +31,6 @@ class IndependentUnion(object):
         if init:
             self.children = map(algorithm.getSafeOpenQueryPlanNaive, self.subqueries)
             self.lam = 1 - reduce(operator.mul, [1-x.lam for x in self.children], 1)
-            print self.lam
         else:
             self.children = []
 

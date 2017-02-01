@@ -1,5 +1,6 @@
 import algorithm
 import itertools
+import operator
 
 
 class InclusionExclusion(object):
@@ -38,6 +39,9 @@ class InclusionExclusion(object):
             for ind, term in enumerate(self.subqueries):
                 plan = algorithm.getSafeOpenQueryPlanNaive(term)
                 self.children.append(plan)
+            # Set our lambda
+            self.lam = -sum(x.lam * c for (x, c) in zip(self.children, self.coeffs))
+
 
     def generateSQL_DNF(self, separatorSubs=None):
         if separatorSubs is None:
