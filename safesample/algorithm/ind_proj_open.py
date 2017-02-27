@@ -62,7 +62,7 @@ class IndependentProject(object):
 
         if init:
             self.child = algorithm.getSafeOpenQueryPlanNaive(self.childDNF)
-            self.lam = 1 - (1 - self.child.lam) ** algorithm.dom
+            self.lam = algorithm.dom * self.child.lam
         else:
             self.child = None
 
@@ -77,7 +77,7 @@ class IndependentProject(object):
             groupByString = 'group by ' + ', '.join(groupBy)
         else:
             groupByString = ''
-        selectString = ', '.join(groupBy + ['ior(COALESCE(pUse,0))'])
+        selectString = ', '.join(groupBy + ['l_ior(COALESCE(pUse,0))'])
         separatorSubs.append((self.replacementVal, self.separator))
 
         childSQL = self.child.generateSQL_DNF(separatorSubs[:])
@@ -92,7 +92,7 @@ class IndependentProject(object):
             sql = "\n -- independent project \n select %s, %s as pUse from (%s) as q%d %s " % (
                 genericConstantStr, selectString, childSQL, algorithm.counter(), groupByString)
         else:
-            add_line = ','.join(groupBy + ["(1.0 - (1.0 - pUse) * power(1.0 - %.10f, (%d - ct))) as pUse" % (self.child.lam, algorithm.dom)])
+            add_line = ','.join(groupBy + ["pUse + %.10f * (%d - ct) as pUse" % (self.child.lam, algorithm.dom)])
             sql = "\n -- independent project \n select %s from (select %s as pUse, count(*) as ct from (%s) as q%d %s) as q%d" % (
                            add_line, selectString, childSQL, algorithm.counter(), groupByString, algorithm.counter())
 

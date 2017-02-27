@@ -1,8 +1,7 @@
 import algorithm
 import operator
-
-lam = 0.3
-
+import scipy
+import numpy as np
 class IndependentJoin(object):
 
     def __init__(self, query, subqueries, init=True):
@@ -33,7 +32,7 @@ class IndependentJoin(object):
 
         if init:
             self.children = map(algorithm.getSafeOpenQueryPlanNaive, self.subqueries)
-            self.lam = reduce(operator.mul, [x.lam for x in self.children], 1)
+            self.lam = reduce(lambda x,y: scipy.misc.logsumexp([x,y,x+y], b=[1,1,-1]), [x.lam for x in self.children])
         else:
             self.children = []
 
@@ -156,7 +155,8 @@ class IndependentJoin(object):
                 (termIdentWithThisSubstitution, separatorReplacement))
 
         # pString = '*'.join(["COALESCE(q%d.pUse,q%d.lam)" % (i, i) for i in counters])
-        pString = '*'.join(["COALESCE(q%d.pUse,%f)" % (i, l) for i, l in zip(counters, [c.lam for c in self.children])])
+        vlist = ["COALESCE(q%d.pUse,%f)" % (i, l) for i, l in zip(counters, [c.lam for c in self.children])]
+        pString = reduce(lambda x,y: "l1prod(" + x + "," + y + ")", vlist)
         #pString = '*'.join(["q%d.pUse" % i for i in counters])
         attString = ', '.join(selectAttributes)
         if attString:

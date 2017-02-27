@@ -1,4 +1,5 @@
 import algorithm
+import numpy as np
 
 
 class GroundTuple(object):
@@ -17,7 +18,7 @@ class GroundTuple(object):
         self.trueOnMissing = False
 
         # Open world value
-        self.lam = algorithm.lam
+        self.lam = np.log1p(-algorithm.lam)
 
         if init:
             # this call must be last for initialization purposes
@@ -46,10 +47,10 @@ class GroundTuple(object):
             alwaysTrue = False
 
         if rel.isSampled():
-            pColumn = "p"
+            pColumn = "ln(1-p)"
             self.isSampled = True
         else:
-            pColumn = "p"
+            pColumn = "ln(1-p)"
 
         if rel.isNegated():
             pColumn = "(1 - %s)" % pColumn

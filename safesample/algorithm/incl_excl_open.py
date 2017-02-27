@@ -1,7 +1,8 @@
 import algorithm
 import itertools
 import operator
-
+import numpy as np
+import scipy
 
 class InclusionExclusion(object):
 
@@ -39,8 +40,15 @@ class InclusionExclusion(object):
             for ind, term in enumerate(self.subqueries):
                 plan = algorithm.getSafeOpenQueryPlanNaive(term)
                 self.children.append(plan)
+
             # Set our lambda
-            self.lam = -sum(x.lam * c for (x, c) in zip(self.children, self.coeffs))
+            self.lam = 0
+            for x, c in sorted(zip(self.children, self.coeffs),key=lambda x:x[1]):
+                print self.lam
+                if c == -1:
+                    self.lam = scipy.misc.logsumexp([self.lam, x.lam, 0], b=[1,1,-1])
+                elif c == 1:
+                    self.lam = scipy.misc.logsumexp([self.lam, x.lam, 0], b=[1,-1,1])
 
 
     def generateSQL_DNF(self, separatorSubs=None):
@@ -106,9 +114,26 @@ class InclusionExclusion(object):
         else:
             subqueryString = ", ".join(subqueries)
 
-        pString = ' + '.join(["( -1 * %d * q%d.pUse)" %
-                              (self.coeffs[ind],
-                               i) for ind, i in enumerate(counters)])
+        red_list = [(self.coeffs[ind],"q%d.pUse" % i) for ind, i in enumerate(counters)]
+        red_list = sorted(red_list, key=lambda x:x[0], reverse=True)
+
+        # recursive function for creating the correct sql code
+        def collapse_func(red_list,ind=None):
+            if ind is None:
+                ind = len(red_list) - 1
+            if ind == 0:
+                if red_list[ind][0] == -1:
+                    return "l1sum(0," + red_list[ind][1] + ")"
+                elif red_list[ind][0] == 1:
+                    return "l1diff(0," + red_list[ind][1] + ")"
+            if red_list[ind][0] == -1:
+                return "l1sum(" + collapse_func(red_list, ind - 1) + "," + red_list[ind][1] + ")"
+            elif red_list[ind][0] == 1:
+                return "l1diff(" + collapse_func(red_list, ind - 1) + "," + red_list[ind][1] + ")"
+        pString = collapse_func(red_list)
+        # pString = ' + '.join(["( -1 * %d * q%d.pUse)" %
+        #                       (self.coeffs[ind],
+        #                        i) for ind, i in enumerate(counters)])
 
         for (i, x) in separatorSubs:
             selectAtts.append("COALESCE(%s) as c%d" % (

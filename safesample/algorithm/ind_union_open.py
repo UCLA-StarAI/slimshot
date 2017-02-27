@@ -30,7 +30,7 @@ class IndependentUnion(object):
             self.usedSeparatorVars]
         if init:
             self.children = map(algorithm.getSafeOpenQueryPlanNaive, self.subqueries)
-            self.lam = 1 - reduce(operator.mul, [1-x.lam for x in self.children], 1)
+            self.lam = sum(x.lam for x in self.children)
         else:
             self.children = []
 
@@ -114,7 +114,7 @@ class IndependentUnion(object):
         subqueryString = " ".join(subqueries)
 
         # pString = '*'.join(["COALESCE(1-q%d.pUse,1)" % i for i in counters])
-        pString = '*'.join(["COALESCE(1-q%d.pUse,1-%f)" % (i, l) for i, l in zip(counters, [c.lam for c in self.children])])
+        pString = '+'.join(["COALESCE(q%d.pUse,%f)" % (i, l) for i, l in zip(counters, [c.lam for c in self.children])])
         for (i, x) in separatorSubs:
             attsToCoalesce = ", ".join(
                 ["q%d.c%d" % (ident, i) for ident in counters
@@ -125,9 +125,9 @@ class IndependentUnion(object):
         attString = ', '.join(selectAtts)
 
         if attString:
-            selectString = '%s, 1-%s as pUse' % (attString, pString)
+            selectString = '%s, %s as pUse' % (attString, pString)
         else:
-            selectString = '1-%s as pUse' % (pString)
+            selectString = '%s as pUse' % (pString)
 
         sql = "\n -- independent union \n select %s from %s %s" % (
             selectString, subqueryString, joinCondition)
