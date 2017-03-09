@@ -375,6 +375,14 @@ class CommandLineParser(cmd.Cmd):
         else:
             print "Open-World off"
 
+    def do_domain(self, line):
+        algorithm.dom = int(line)
+        print "Open-world domain size set to %d" % algorithm.dom
+
+    def do_lam(self, line):
+        algorithm.lam = float(line)
+        print "Open-world lambda value set to %f" % algorithm.lam
+
     def do_karpluby(self, line):
         self.karpluby = not self.karpluby
         if self.karpluby:
@@ -421,22 +429,13 @@ if __name__ == '__main__':
 
     conn = psycopg2.connect(dbname=database)
     conn.autocommit = True
- #    sql = """SELECT c7,
- #        ior(COALESCE(pUse,0)) AS pUse
- #   FROM
- #     ( -- ground tuple
- # SELECT st.v0 AS c8,
- #        st.v1 AS c7,
- #        p AS pUse
- #      FROM st) AS q13
- #   GROUP BY c7"""
- #    cur = conn.cursor()
- #    try:
- #        cur.execute(sql)
- #        print(cur.fetchall())
- #        cur.close()
- #    except psycopg2.Error as e:
- #        print "SQL error: %s" % e.pgerror
- #        cur.close()
+    # cur = conn.cursor()
+    # try:
+    #     cur.execute(sql)
+    #     print cur.fetchall()
+    #     cur.close()
+    # except psycopg2.Error as e:
+    #     print "SQL error: %s" % e.pgerror
+    #     cur.close()
 
     CommandLineParser().cmdloop()
