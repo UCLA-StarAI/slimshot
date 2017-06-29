@@ -110,3 +110,21 @@ following commands, then rerun the query:
 > R(x),S(x,y),T(y)
 ```
 
+An Open World Query
+----
+
+The same parser can also be used to compute open world queries, with the limitation that it will assume the same domain size and default max probability for all variables. To run an openworld query and find an upper bound on the probability, simply enable the openworld flag and rerun the query:
+
+```
+> openworld
+> R(x),S(x,y),T(y)
+```
+
+The domain size and default probability can be modified with the domain and lam commands respectively, as follows:
+
+```
+> domain 30
+> lam 0.01
+```
+
+Note that switching to openworld will automatically switch the domain in which computations are done from the standard domain to the natural log of the inverse probability, and will return upper bounds in this domain. The database does not need to be modified, and lam values should still be given as probabilities (i.e. in (0,1)). 
